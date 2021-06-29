@@ -4,10 +4,10 @@ A class and sample code for the Kitronik Autonomous Robotics Platform for the Ra
 This is the MicroPython version. For Circuit Python see: 
 https://github.com/KitronikLtd/Kitronik-Pico-Autonomous-Robotics-Platform-CircuitPython
 
-To use save PicoAutonomusRobotics.py file onto the Pico so it can be imported
-## Import PicoAutonomusRobotics.py and construct an instance:
-    import PicoAutonomusRobotics
-    robot = PicoAutonomusRobotics.KitronikPicoRobotBuggy()
+To use save PicoAutonomousRobotics.py file onto the Pico so it can be imported
+## Import PicoAutonomousRobotics.py and construct an instance:
+    import PicoAutonomousRobotics
+    robot = PicoAutonomousRobotics.KitronikPicoRobotBuggy()
 
 This will setup the correct pins to drive the motors. 
 ## Drive a motor:
