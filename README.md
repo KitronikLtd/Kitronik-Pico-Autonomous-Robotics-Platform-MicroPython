@@ -91,7 +91,7 @@ The centre sensor is slightly ahead of the side sensors.
 
 ### Read values:
 ```python
-robot.getRawLFValue(WhichSensor):
+robot.getRawLFValue(whichSensor):
 ```
 returns:
 * the raw sensor value in the range 0-65535 (low numbers represent dark surfaces)  
