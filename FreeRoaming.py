@@ -4,19 +4,19 @@
 #uses the onboard button for a start / stop command via an IRQ.
 
 from PicoAutonomousRobotics import KitronikPicoRobotBuggy
-import time
+from time import sleep_ms
 
 buggy = KitronikPicoRobotBuggy()
-StartStop = False
+startStop = False
 
 
 def ButtonIRQHandler(pin):
-    global StartStop
+    global startStop
     if pin == buggy.button: 
-        if StartStop == True:
-            StartStop = False
+        if startStop == True:
+            startStop = False
         else:
-            StartStop = True
+            startStop = True
 
 buggy.button.irq(trigger=machine.Pin.IRQ_RISING, handler =  ButtonIRQHandler)
 
@@ -27,11 +27,11 @@ buggy.setLED(3,buggy.PURPLE)
 buggy.show()
 
 while True:
-    if StartStop == True:
-        frontdistance = buggy.getDistance("f")
-        reardistance = buggy.getDistance("r")
+    if startStop == True:
+        frontDistance = buggy.getDistance("f")
+        rearDistance = buggy.getDistance("r")
         
-        if(frontdistance > 15):
+        if(frontDistance > 15):
             #all clear, speed ahead
             buggy.setLED(0,buggy.GREEN)
             buggy.setLED(1,buggy.GREEN)
@@ -40,7 +40,7 @@ while True:
             buggy.motorOn("l","f",85)
             buggy.motorOn("r","f",85)
             
-        elif (frontdistance > 5):
+        elif (frontDistance > 5):
             #something in the way, but we (probably) have time to miss it
             buggy.setLED(0,buggy.GREEN)
             buggy.setLED(1,buggy.GREEN)
@@ -48,7 +48,7 @@ while True:
             buggy.setLED(3,buggy.GREEN)
             buggy.motorOff("l")
             buggy.motorOff("r")
-            if(reardistance>15):
+            if(rearDistance>15):
                 #there is space for us to reverse in a curve and try again
                 buggy.setLED(0,buggy.BLUE)
                 buggy.setLED(1,buggy.BLUE)
@@ -56,16 +56,16 @@ while True:
                 buggy.setLED(3,buggy.BLUE)
                 buggy.motorOn("l","r",100)
                 buggy.motorOn("r","r",50)
-                time.sleep_ms(100)
+                sleep_ms(100)
             else:
-                #spin on the spot 
+                #spin on the spot CW
                 buggy.setLED(0,buggy.YELLOW)
                 buggy.setLED(1,buggy.YELLOW)
                 buggy.setLED(2,buggy.YELLOW)
                 buggy.setLED(3,buggy.YELLOW)
                 buggy.motorOn("l","f",100)
                 buggy.motorOn("r","r",100)
-        else:
+        else: #spin on the spot CCW
             buggy.setLED(0,buggy.RED)
             buggy.setLED(1,buggy.RED)
             buggy.setLED(2,buggy.RED)
@@ -73,7 +73,7 @@ while True:
             buggy.motorOn("l","r",100)
             buggy.motorOn("r","f",100)
         buggy.show()
-    else:
+    else: #motors turned off
         buggy.motorOff("l")
         buggy.motorOff("r")
         buggy.setLED(0,buggy.PURPLE)
@@ -81,4 +81,4 @@ while True:
         buggy.setLED(2,buggy.PURPLE)
         buggy.setLED(3,buggy.PURPLE)
         buggy.show()
-    time.sleep_ms(50)
+    sleep_ms(50)
