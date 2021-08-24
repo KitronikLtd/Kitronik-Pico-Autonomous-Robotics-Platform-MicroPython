@@ -4,22 +4,22 @@
 #else it uses the difference between the side sensors to determine which way the buggy has turned and correct by reversing one of the motors.
 
 from PicoAutonomousRobotics import KitronikPicoRobotBuggy
-import time
+from time import sleep, sleep_ms
 
 buggy = KitronikPicoRobotBuggy()
 
 buggy.setLED(0,buggy.RED)
 buggy.show()
-time.sleep(1)
+sleep(1)
 buggy.setLED(1,buggy.RED)
 buggy.show()
-time.sleep(1)
+sleep(1)
 buggy.setLED(2,buggy.RED)
 buggy.show()
-time.sleep(1)
+sleep(1)
 buggy.setLED(3,buggy.RED)
 buggy.show()
-time.sleep(1)
+sleep(1)
 buggy.setLED(0,buggy.GREEN)
 buggy.setLED(1,buggy.GREEN)
 buggy.setLED(2,buggy.GREEN)
@@ -56,5 +56,4 @@ while True:
         buggy.motorOn("l","f",75)
         buggy.motorOn("r","f",75)
     buggy.show()
-    time.sleep_ms(10)
-    
+    sleep_ms(10)
