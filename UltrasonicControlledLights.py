@@ -15,8 +15,8 @@ buggy.setLED(3,buggy.GREEN)
 buggy.show()
 
 while True:
-    frontDistance = buggy.GetDistance("f")
-    rearDistance = buggy.GetDistance("r")
+    frontDistance = buggy.getDistance("f")
+    rearDistance = buggy.getDistance("r")
     #change LED colour depending on the distance measured
     if(frontDistance > 15):
         buggy.setLED(0,buggy.GREEN)
