@@ -2,18 +2,19 @@
 # This is the micropython version of the module
 # for Circuit python go to:
 # https://github.com/KitronikLtd/Kitronik-Pico-Autonomous-Robotics-Platform-CircuitPython
-
+# For more details on the product please visit
+# https://www.kitronik.co.uk/5335
 
 import array
 from machine import Pin, PWM, ADC, time_pulse_us
 from rp2 import PIO, StateMachine, asm_pio
 from time import sleep, sleep_us, ticks_us
 
-
 class KitronikPicoRobotBuggy:
     #button fo user input:
     button = Pin(0,Pin.IN,Pin.PULL_DOWN)
-#Motors
+    
+#Motors: controls the motor directions and speed for both motors
     def motorOn(self,motor, direction, speed):
         #cap speed to 0-100%
         if (speed<0):
@@ -21,23 +22,23 @@ class KitronikPicoRobotBuggy:
         elif (speed>100):
             speed=100
         #convert 0-100 to 0-65535
-        PWM = int(speed*655.35)
+        PWMVal = int(speed*655.35)
         if motor == "l":
             if direction == "f":
-                self.motor1Forward.duty_u16(PWM)
+                self.motor1Forward.duty_u16(PWMVal)
                 self.motor1Reverse.duty_u16(0)
             elif direction == "r":
                 self.motor1Forward.duty_u16(0)
-                self.motor1Reverse.duty_u16(PWM)
+                self.motor1Reverse.duty_u16(PWMVal)
             else:
                 raise Exception("INVALID DIRECTION") #harsh, but at least you'll know
         elif motor == "r":
             if direction == "f":
-                self.motor2Forward.duty_u16(PWM)
+                self.motor2Forward.duty_u16(PWMVal)
                 self.motor2Reverse.duty_u16(0)
             elif direction == "r":
                 self.motor2Forward.duty_u16(0)
-                self.motor2Reverse.duty_u16(PWM)
+                self.motor2Reverse.duty_u16(PWMVal)
             else:
                 raise Exception("INVALID DIRECTION") #harsh, but at least you'll know
         else:
@@ -45,16 +46,16 @@ class KitronikPicoRobotBuggy:
     #To turn off set the speed to 0...
     def motorOff(self,motor):
         self.motorOn(motor,"f",0)
+        
 #ServoControl:
     #Servo 0 degrees -> pulse of 0.5ms, 180 degrees 2.5ms
     #pulse train freq 50hz - 20mS
     #1uS is freq of 1000000
     #servo pulses range from 500 to 2500usec and overall pulse train is 20000usec repeat.
     #servo pins on P.A.R.P. are: Servo 1: 21, Servo2 10, Servo 3 17, Servo 4 11
-
     maxServoPulse = 2500
     minServoPulse = 500
-    PulseTrain = 20000
+    pulseTrain = 20000
     degreesToUS = 2000/180
     
     #this code drives a pwm on the PIO. It is running at 2Mhz, which gives the PWM a 1uS resolution. 
@@ -70,8 +71,7 @@ class KitronikPicoRobotBuggy:
         nop()         .side(1)
         label("skip")
         jmp(y_dec, "loop") #count down y by 1 and jump to pwmloop. When y is 0 we will go back to the 'pull' command
-        
-        
+             
     #doesnt actually register/unregister, just stops and starts the servo PIO
     def registerServo(self,servo):
         self.servos[servo].active(1)
@@ -83,7 +83,6 @@ class KitronikPicoRobotBuggy:
     #1 degree ~ 11uS.
     #This function does the sum then calls goToPeriod to actually poke the PIO 
     def goToPosition(self,servo, degrees):
-
         pulseLength = int(degrees*self.degreesToUS + 500)
         self.goToPeriod(servo,pulseLength)
     
@@ -98,12 +97,10 @@ class KitronikPicoRobotBuggy:
         servoPins = [21,10,17,11]
         for i in range(4):
             self.servos.append (StateMachine(i, self._servo_pwm, freq=2000000, sideset_base=Pin(servoPins[i])))
-            self.servos[i].put(self.PulseTrain)
+            self.servos[i].put(self.pulseTrain)
             self.servos[i].exec("pull()")
             self.servos[i].exec("mov(isr, osr)")
-
-
-
+            
 #ZIPLEDS
 #We drive the ZIP LEDs using one of the PIO statemachines. 
     @asm_pio(sideset_init=PIO.OUT_LOW, out_shiftdir=PIO.SHIFT_LEFT, autopull=True, pull_thresh=24)
@@ -163,8 +160,7 @@ class KitronikPicoRobotBuggy:
 
 #Ultrasonic:
     #there are 2 Ultrasonic headers. The front one is the default if not explicitly called wth 'r' for rear
-    # if we get a timeout (which would be a not fitted sensor, or a range over the sensors maximium the distance returned is -1    
-        
+    # if we get a timeout (which would be a not fitted sensor, or a range over the sensors maximium the distance returned is -1           
     def getDistance(self, whichSensor = "f"):
         trigger = Pin(14, Pin.OUT)
         echo = Pin(15, Pin.IN)
@@ -176,14 +172,13 @@ class KitronikPicoRobotBuggy:
         trigger.high()
         sleep_us(5)
         trigger.low()
-        timepassed = time_pulse_us(echo, 1, self.maxDistanceTimeout)
+        timePassed = time_pulse_us(echo, 1, self.maxDistanceTimeout)
         if(timepassed ==-1): #timeout - range equivalent of 5 meters - past the sensors limit or not fitted
             distance = -1
         else:
-            distance = (timepassed * self.conversionFactor) / 2
+            distance = (timePassed * self.conversionFactor) / 2
         return distance
-
-        
+       
     def setMeasurementsTo(self,units):
         #0.0343 cm per microsecond or 0.0135 inches
         if(units == "inch"):
@@ -191,17 +186,15 @@ class KitronikPicoRobotBuggy:
         else:
             self.conversionFactor = 0.0343 #cm is default - we are in  metric world.
 
-#Linefollower: there are 3 LF sensors on the plug in board.
-            
+#Linefollower: there are 3 LF sensors on the plug in board.        
     #gets the raw (0-65535) value of the sensor. 65535 is full dark, 0 would be full brightness.
-    #in practice the values tend to vary between approx 5000 - 60000
-            
-    def getRawLFValue(self,WhichSensor):
-        if(WhichSensor == "c"):
+    #in practice the values tend to vary between approx 5000 - 60000   
+    def getRawLFValue(self,whichSensor):
+        if(whichSensor == "c"):
             return self.CentreLF.read_u16()
-        elif (WhichSensor == "l"):
+        elif (whichSensor == "l"):
             return self.LeftLF.read_u16()
-        elif (WhichSensor == "r"):
+        elif (whichSensor == "r"):
             return self.RightLF.read_u16()
         else:
             raise Exception("INVALID SENSOR") #harsh, but at least you'll know
@@ -230,11 +223,8 @@ class KitronikPicoRobotBuggy:
             return True
         else:
             raise Exception("Sensor value 'Grey'")
-        
 
-
-#Buzzer:
-       
+#Buzzer: functions will sound a horn or a required frequency. Option aswell to silence the buzzer
     def silence(self):
         self.buzzer.duty_u16(0) #silence by setting duty to 0
         
@@ -251,7 +241,7 @@ class KitronikPicoRobotBuggy:
         sleep(0.3)
         self.silence()
 
-    #initialisation code for using:
+#initialisation code for using:
     #defaults to the standard pins and freq for the kitronik board, but could be overridden
     def __init__(self):
         self.motor1Forward=PWM(Pin(20))
