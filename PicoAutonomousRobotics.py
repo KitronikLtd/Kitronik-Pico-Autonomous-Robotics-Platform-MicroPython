@@ -149,6 +149,15 @@ class KitronikPicoRobotBuggy:
         else:
             self.theLEDs[whichLED] = (whichColour[1]<<16) + (whichColour[0]<<8) + whichColour[2]
     
+    #gets the stored colour of an individual LED, which isnt nessecerily the colour on show if it has been changed, but not 'show'n
+    def getLED(self,whichLED):
+        if(whichLED<0):
+            raise Exception("INVALID LED:",whichLED," specified")
+        elif(whichLED>3):
+            raise Exception("INVALID LED:",whichLED," specified")
+        else:
+            return(((self.theLEDs[whichLED]>>8) & 0xff), ((self.theLEDs[whichLED]>>16)& 0xff) ,((self.theLEDs[whichLED])& 0xff))
+    
     #takes 0-100 as a brightness value, brighness is applies in the'show' function
     def setBrightness(self, value):
             #cap to 0-100%
