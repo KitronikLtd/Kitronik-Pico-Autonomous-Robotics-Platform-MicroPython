@@ -4,6 +4,8 @@ from time import sleep
 buggy = KitronikPicoRobotBuggy()
 run = False
 
+DegreesPerSecond = (6/5)*360
+
 def ButtonIRQHandler(pin):
     global run
     if(run):
@@ -28,8 +30,6 @@ def Stop():
 def Spin():
     buggy.motorOn("l","f",80)
     buggy.motorOn("r","r",80)
-
-DegreesPerSecond = (6/5)*360
 
 def TurnRight(HowFar):
     buggy.motorOn("l","f",80)
