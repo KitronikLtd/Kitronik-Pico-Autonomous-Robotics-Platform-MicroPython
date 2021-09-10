@@ -182,7 +182,7 @@ class KitronikPicoRobotBuggy:
         sleep_us(5)
         trigger.low()
         timePassed = time_pulse_us(echo, 1, self.maxDistanceTimeout)
-        if(timepassed ==-1): #timeout - range equivalent of 5 meters - past the sensors limit or not fitted
+        if(timePassed ==-1): #timeout - range equivalent of 5 meters - past the sensors limit or not fitted
             distance = -1
         else:
             distance = (timePassed * self.conversionFactor) / 2
