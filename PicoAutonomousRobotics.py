@@ -217,6 +217,9 @@ class KitronikPicoRobotBuggy:
         
     #this returns True when sensor is over light and FALSE over Dark.
     #Light/Dark is determined by the thresholds.
+    # This code will throw an exception if the value returned is in the 'gery' area.
+    #This can happen is you sample half on /off a line for instance.
+    #Setting the thresholds to the same value will negate this functionality
     def isLFSensorLight(self,whichSensor):
         if(whichSensor == "c"):
             sensorVal = self.CentreLF.read_u16()
