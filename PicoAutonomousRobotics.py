@@ -75,7 +75,7 @@ class KitronikPicoRobotBuggy:
     #doesnt actually register/unregister, just stops and starts the servo PIO
     def registerServo(self,servo):
         self.servos[servo].active(1)
-    def deregisterServo(servo):
+    def deregisterServo(self, servo):
         self.servos[servo].active(0)
  
     # goToPosition takes a degree position for the serov to goto. 
