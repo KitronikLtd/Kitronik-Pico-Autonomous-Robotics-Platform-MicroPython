@@ -285,6 +285,7 @@ class KitronikPicoRobotBuggy:
         self.conversionFactor = 0.0343
         self.maxDistanceTimeout = int( 2 * 500 /self.conversionFactor) # 500cm is past the 400cm max range by a reasonable amount for a timeout
         self.buzzer = PWM(Pin(16))
+        self.buzzer.duty_u16(0) #ensure silence by setting duty to 0
         #setup LineFollow Pins
         self.CentreLF = ADC(27)
         self.LeftLF = ADC(28)
