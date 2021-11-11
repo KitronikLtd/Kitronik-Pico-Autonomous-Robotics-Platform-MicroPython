@@ -15,6 +15,19 @@ class KitronikPicoRobotBuggy:
     button = Pin(0,Pin.IN,Pin.PULL_DOWN)
     
 #Motors: controls the motor directions and speed for both motors
+    def _initMotors(self):
+        self.motor1Forward=PWM(Pin(20))
+        self.motor1Reverse=PWM(Pin(19))
+        self.motor2Forward=PWM(Pin(6))
+        self.motor2Reverse=PWM(Pin(7))
+        #set the PWM to 10Khz
+        self.motor1Forward.freq(10000)
+        self.motor1Reverse.freq(10000)
+        self.motor2Forward.freq(10000)
+        self.motor2Reverse.freq(10000)
+        self.motorOff("l")
+        self.motorOff("r")
+        
     def motorOn(self,motor, direction, speed):
         #cap speed to 0-100%
         if (speed<0):
@@ -256,15 +269,7 @@ class KitronikPicoRobotBuggy:
 #initialisation code for using:
     #defaults to the standard pins and freq for the kitronik board, but could be overridden
     def __init__(self):
-        self.motor1Forward=PWM(Pin(20))
-        self.motor1Reverse=PWM(Pin(19))
-        self.motor2Forward=PWM(Pin(6))
-        self.motor2Reverse=PWM(Pin(7))
-        #set the PWM to 10Khz
-        self.motor1Forward.freq(10000)
-        self.motor1Reverse.freq(10000)
-        self.motor2Forward.freq(10000)
-        self.motor2Reverse.freq(10000)
+        self._initMotors()
         self.servos = []
         self._initServos()
         #connect the servos by default on construction - advanced uses can disconnect them if required.
