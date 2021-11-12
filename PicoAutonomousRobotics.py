@@ -222,12 +222,34 @@ class KitronikPicoRobotBuggy:
             raise Exception("INVALID SENSOR") #harsh, but at least you'll know
             return 0 #just in case
     
-    def setLFDarkValue(self,darkThreshold):
-        self.darkVal = darkThreshold
+    #These functions set the thresholds for light/dark sensing to return true / false
+    #there should be a gap between light and dark thresholds, to give soem deadbanding.
+    #if specified OptionalLeftThreshold and OptionalRightThreshold give you the ability to
+    #specify 3 sets of values. If missing then all sensors use the same value.
+    #initially all sensors are set to 30000  for light and 35000 for dark.
         
-    def setLFLightValue(self,lightThreshold):
-        self.lightVal = lightThreshold
+    def setLFDarkValue(self,darkThreshold, OptionalLeftThreshold = -1, OptionalRightThreshold = -1):
+        self.centreDarkVal = darkThreshold
+        if(OptionalLeftThreshold == -1):
+            self.leftDarkVal = darkThreshold
+        else:
+            self.leftDarkVal = OptionalLeftThreshold
+        if(OptionalRightThreshold == -1):
+            self.rightDarkVal = darkThreshold
+        else:
+            self.rightDarkVal = OptionalRightThreshold
         
+    def setLFLightValue(self,lightThreshold, OptionalLeftThreshold = -1, OptionalRightThreshold = -1):
+        self.centreLightVal = lightThreshold
+        if(OptionalLeftThreshold == -1):
+            self.leftLightVal = lightThreshold
+        else:
+            self.leftLightVal = OptionalLeftThreshold
+        if(OptionalRightThreshold == -1):
+            self.rightLightVal = lightThreshold
+        else:
+            self.rightLightVal = OptionalRightThreshold
+ 
     #this returns True when sensor is over light and FALSE over Dark.
     #Light/Dark is determined by the thresholds.
     # This code will throw an exception if the value returned is in the 'gery' area.
@@ -236,18 +258,30 @@ class KitronikPicoRobotBuggy:
     def isLFSensorLight(self,whichSensor):
         if(whichSensor == "c"):
             sensorVal = self.CentreLF.read_u16()
+            if(sensorVal >= self.centreDarkVal):
+                return False
+            elif(sensorVal < self.centreLightVal):
+                return True
+            else:
+                raise Exception("Sensor value 'Grey'")
         elif (whichSensor == "l"):
             sensorVal = self.LeftLF.read_u16()
+            if(sensorVal >= self.leftDarkVal):
+                return False
+            elif(sensorVal < self.leftLightVal):
+                return True
+            else:
+                raise Exception("Sensor value 'Grey'")            
         elif (whichSensor == "r"):
             sensorVal = self.RightLF.read_u16()
+            if(sensorVal >= self.rightDarkVal):
+                return False
+            elif(sensorVal < self.rightLightVal):
+                return True
+            else:
+                raise Exception("Sensor value 'Grey'")
         else:
             raise Exception("INVALID SENSOR") #harsh, but at least you'll know
-        if(sensorVal>self.darkVal):
-            return False
-        elif(sensorVal<self.lightVal):
-            return True
-        else:
-            raise Exception("Sensor value 'Grey'")
 
 #Buzzer: functions will sound a horn or a required frequency. Option aswell to silence the buzzer
     def silence(self):
@@ -292,6 +326,10 @@ class KitronikPicoRobotBuggy:
         self.RightLF = ADC(26)
         #The LF circuit is setup to give a high value when a dark (non reflective) surface is in view,and a low value when a light (reflective) surface is in view.
         #To aid there is a 'is it light or dark' function, and these values set the thresholds for determining that.
-        self.LightVal = 30000 
-        self.DarkVal = 35000
+        self.centreLightVal = 30000 
+        self.centreDarkVal = 35000
+        self.leftLightVal = 30000 
+        self.leftDarkVal = 35000
+        self.rightLightVal = 30000 
+        self.rightDarkVal = 35000
     
