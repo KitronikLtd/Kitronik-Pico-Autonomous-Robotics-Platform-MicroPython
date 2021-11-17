@@ -110,12 +110,15 @@ where:
 The light / dark determination is based on the values in "darkThreshold" and "lightThreshold".  
 To set the thresholds use:
 ```python
-robot.setLFDarkValue(darkThreshold)
+robot.setLFDarkValue(darkThreshold, OptionalLeftThreshold = -1, OptionalRightThreshold = -1)
 ```
 ```python
-robot.setLFLightValue(lightThreshold)
+robot.setLFLightValue(lightThreshold, OptionalLeftThreshold = -1, OptionalRightThreshold = -1)
 ```
-Typical values for 'Light' surfaces would be under 20000, and for 'Dark' surfaces over 30000.
+Typical values for 'Light' surfaces would be under 20000, and for 'Dark' surfaces over 30000.  
+Optional thresholds can set different values for Left and Right sensors in which case the first value sets the Centre threshold.  
+If not used all 3 sensors have the same threshold.
+
     
 ## Buzzer
 The buzzer is driven with a PWM pin.  
