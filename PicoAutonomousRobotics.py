@@ -87,9 +87,11 @@ class KitronikPicoRobotBuggy:
              
     #doesnt actually register/unregister, just stops and starts the servo PIO
     def registerServo(self,servo):
-        self.servos[servo].active(1)
+        if(not self.servos[servo].active()):
+            self.servos[servo].active(1)
     def deregisterServo(self, servo):
-        self.servos[servo].active(0)
+        if(self.servos[servo].active()):
+            self.servos[servo].active(0)
  
     # goToPosition takes a degree position for the serov to goto. 
     # 0degrees->180 degrees is 0->2000us, plus offset of 500uS
@@ -104,7 +106,11 @@ class KitronikPicoRobotBuggy:
             period = 500
         if(period >2500):
             period =2500
-        self.servos[servo].put(period)
+        #check if servo SM is active, otherwise we are trying to control a thing we do not have control over
+        if self.servos[servo].active():
+            self.servos[servo].put(period)
+        else:
+            raise Exception("TRYING TO CONTROL UNREGISTERED SERVO") #harsh, but at least you'll know
         
     def _initServos(self):
         servoPins = [21,10,17,11]
