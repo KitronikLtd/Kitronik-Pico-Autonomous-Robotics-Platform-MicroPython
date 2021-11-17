@@ -1,7 +1,6 @@
 # Pico Autonomous Robotics Platform
 # This is the micropython version of the module
-# for Circuit python go to:
-# https://github.com/KitronikLtd/Kitronik-Pico-Autonomous-Robotics-Platform-CircuitPython
+# Version 1.0 Initial Release
 # For more details on the product please visit
 # https://www.kitronik.co.uk/5335
 
