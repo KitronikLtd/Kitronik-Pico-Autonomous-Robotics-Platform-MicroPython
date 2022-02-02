@@ -156,7 +156,7 @@ class KitronikPicoRobotBuggy:
             brightAdjustedLEDs[i] = (g<<16) + (r<<8) + b
         self.ZIPLEDs.put(brightAdjustedLEDs, 8)
     def clear(self,whichLED):
-        setLED(whichLED,self.BLACK)
+        self.setLED(whichLED,self.BLACK)
         
     #sets the colour of an individual LED. Use show to make change visible
     def setLED(self,whichLED, whichColour):
