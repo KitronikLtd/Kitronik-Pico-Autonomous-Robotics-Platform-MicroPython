@@ -7,7 +7,7 @@
 import array
 from machine import Pin, PWM, ADC, time_pulse_us
 from rp2 import PIO, StateMachine, asm_pio
-from time import sleep, sleep_us, ticks_us
+from time import sleep, sleep_ms, sleep_us, ticks_us
 
 class KitronikPicoRobotBuggy:
     #button fo user input:
@@ -19,20 +19,26 @@ class KitronikPicoRobotBuggy:
         self.motor1Reverse=PWM(Pin(19))
         self.motor2Forward=PWM(Pin(6))
         self.motor2Reverse=PWM(Pin(7))
-        #set the PWM to 10Khz
-        self.motor1Forward.freq(10000)
-        self.motor1Reverse.freq(10000)
-        self.motor2Forward.freq(10000)
-        self.motor2Reverse.freq(10000)
+        #set the PWM to 50Hz
+        self.motor1Forward.freq(50)
+        self.motor1Reverse.freq(50)
+        self.motor2Forward.freq(50)
+        self.motor2Reverse.freq(50)
         self.motorOff("l")
         self.motorOff("r")
         
-    def motorOn(self,motor, direction, speed):
+    def motorOn(self,motor, direction, speed, bypass=False):
         #cap speed to 0-100%
         if (speed<0):
             speed = 0
         elif (speed>100):
             speed=100
+
+        #TODO: insert good comment here
+        if (not bypass and speed>0.1 and speed<30):
+            self.motorOn(motor,direction,100,True)
+            sleep_ms(20)
+
         #convert 0-100 to 0-65535
         PWMVal = int(speed*655.35)
         if motor == "l":
