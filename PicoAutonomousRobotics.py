@@ -19,24 +19,38 @@ class KitronikPicoRobotBuggy:
         self.motor1Reverse=PWM(Pin(19))
         self.motor2Forward=PWM(Pin(6))
         self.motor2Reverse=PWM(Pin(7))
-        #set the PWM to 50Hz
-        self.motor1Forward.freq(50)
-        self.motor1Reverse.freq(50)
-        self.motor2Forward.freq(50)
-        self.motor2Reverse.freq(50)
+        #set the PWM to 100Hz
+        self.motor1Forward.freq(100)
+        self.motor1Reverse.freq(100)
+        self.motor2Forward.freq(100)
+        self.motor2Reverse.freq(100)
         self.motorOff("l")
         self.motorOff("r")
         
-    def motorOn(self,motor, direction, speed, bypass=False):
+    def motorOn(self,motor, direction, speed, jumpStart=False):
         #cap speed to 0-100%
         if (speed<0):
             speed = 0
         elif (speed>100):
             speed=100
-
-        #TODO: insert good comment here
-        if (not bypass and speed>0.1 and speed<30):
-            self.motorOn(motor,direction,100,True)
+        
+        frequency = 100
+        if (speed < 15):
+            frequency = 20
+        elif (speed < 20):
+            frequency = 50
+            
+        
+        self.motor1Forward.freq(frequency)
+        self.motor1Reverse.freq(frequency)
+        self.motor2Forward.freq(frequency)
+        self.motor2Reverse.freq(frequency)
+        
+        # Jump start motor by setting to 100% for 20 ms,
+        # then dropping to speed specified.
+        # Down to jump start the motor when set at low speed
+        if (not jumpStart and speed > 0.1 and speed < 35):
+            self.motorOn(motor, direction, 100, True)
             sleep_ms(20)
 
         #convert 0-100 to 0-65535
