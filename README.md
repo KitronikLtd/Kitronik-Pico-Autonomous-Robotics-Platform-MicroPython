@@ -1,3 +1,4 @@
+Other languages: [FRANCAIS](README_FR.md)
 # Kitronik-Pico-Autonomous-Robotics-Platform-MicroPython
 A class and sample code for the Kitronik Autonomous Robotics Platform for the Raspberry Pi Pico. (www.kitronik.co.uk/5335)
 
@@ -5,7 +6,7 @@ On the Autonomous Robotics Platform:
 * Forward is defined as the end away from the power switch / castor  
 * Left and Right are defined when facing Forward  
 * The Pico should be inserted with the USB connector facing the rear (away from the Pen hole)  
-  
+
 To use, save PicoAutonomousRobotics.py file onto the Pico so it can be imported.
 ## Import PicoAutonomousRobotics.py and construct an instance:
 ```python
@@ -46,9 +47,9 @@ where:
 * servo => the servo number (0-3)
 
 
-### Drive a servo: 
+### Drive a servo:
 
-```python 
+```python
     robot.goToPosition(servo, degrees)
 ```
 where:
@@ -56,7 +57,7 @@ where:
 * degrees => 0-180
 
 
-```python 
+```python
     robot.goToPeriod(servo, period)
  ```   
 where:
@@ -65,10 +66,10 @@ where:
 
 ## Ultrasonic Sensor
 ### Read ultrasonic distance:
-```python 
+```python
 robot.getDistance(whichSensor)
 ```
-where 
+where
 * whichSensor => "f" or "r" for front or rear sensor
 This parameter is defaulted to "f" so the call can be:  
 ```python
@@ -103,7 +104,7 @@ robot.isLFSensorLight(whichSensor):
 returns:  
 * **True** when sensor is over a light surface and **False** when over a dark surface
 
-where: 
+where:
 * whichSensor => "l","r", or "c"
 
 ### Set light / dark thresholds:
@@ -119,7 +120,7 @@ Typical values for 'Light' surfaces would be under 20000, and for 'Dark' surface
 Optional thresholds can set different values for Left and Right sensors in which case the first value sets the Centre threshold.  
 If not used all 3 sensors have the same threshold.
 
-    
+
 ## Buzzer
 The buzzer is driven with a PWM pin.  
 
@@ -153,7 +154,7 @@ where:
 ```python
 COLOURS = (BLACK, RED, YELLOW, GREEN, CYAN, BLUE, PURPLE, WHITE)
 ```
-Turn off the LEDs: 
+Turn off the LEDs:
 ```python
 robot.clear(whichLED)
 ```
@@ -165,7 +166,7 @@ Control the brightness:
 robot.setBrightness(value)
 ```
 where:  
-* value => 0-100 (brightness value in %) 
+* value => 0-100 (brightness value in %)
 
 ### Make the changes visible:
 ```python
@@ -175,5 +176,3 @@ robot.show():
 # Troubleshooting
 
 This code is designed to be used as a module. See: https://kitronik.co.uk/blogs/resources/modules-micro-python-and-the-raspberry-pi-pico for more information
-
-
