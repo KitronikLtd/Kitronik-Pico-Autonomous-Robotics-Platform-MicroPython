@@ -83,76 +83,44 @@ class KitronikPicoRobotBuggy:
         self.motorOn(motor,"f",0)
         
 #ServoControl:
-    #Servo 0 degrees -> pulse of 0.5ms, 180 degrees 2.5ms
-    #pulse train freq 50hz - 20mS
-    #1uS is freq of 1000000
-    #servo pulses range from 500 to 2500usec and overall pulse train is 20000usec repeat.
-    #servo pins on P.A.R.P. are: Servo 1: 21, Servo2 10, Servo 3 17, Servo 4 11
-    maxServoPulse = 2500
-    minServoPulse = 500
-    pulseTrain = 20000
-    degreesToUS = 2000/180
-    
-    #this code drives a pwm on the PIO. It is running at 2Mhz, which gives the PWM a 1uS resolution. 
-    @asm_pio(sideset_init=PIO.OUT_LOW)
-    def _servo_pwm():
-    #first we clear the pin to zero, then load the registers. Y is always 20000 - 20uS, x is the pulse 'on' length.     
-        pull(noblock) .side(0)
-        mov(x, osr) # Keep most recent pull data stashed in X, for recycling by noblock
-        mov(y, isr) # ISR must be preloaded with PWM count max
-    #This is where the looping work is done. the overall loop rate is 1Mhz (clock is 2Mhz - we have 2 instructions to do)    
-        label("loop")
-        jmp(x_not_y, "skip") #if there is 'excess' Y number leave the pin alone and jump to the 'skip' label until we get to the X value
-        nop()         .side(1)
-        label("skip")
-        jmp(y_dec, "loop") #count down y by 1 and jump to pwmloop. When y is 0 we will go back to the 'pull' command
-             
     #doesnt actually register/unregister, just stops and starts the servo PIO
-    def registerServo(self,servo):
-        if(not self.servos[servo].active()):
-            self.servos[servo].active(1)
+    def registerServo(self, servo):
+        self.servos[servo] = PWM(Pin(self.servoPins[servo]))
+        self.servos[servo].freq(50)
+        self.goToPosition(servo, 90)
+
     def deregisterServo(self, servo):
-        if(self.servos[servo].active()):
-            self.servos[servo].active(0)
+        self.servos[servo].deinit()
+ 
+    def scale(self, value, fromMin, fromMax, toMin, toMax):
+        return toMin + ((value - fromMin) * ((toMax - toMin) / (fromMax - fromMin)))
  
     # goToPosition takes a degree position for the serov to goto. 
     # 0degrees->180 degrees is 0->2000us, plus offset of 500uS
     #1 degree ~ 11uS.
     #This function does the sum then calls goToPeriod to actually poke the PIO 
     def goToPosition(self,servo, degrees):
-        pulseLength = int(degrees*self.degreesToUS + 500)
-        self.goToPeriod(servo,pulseLength)
+        if degrees < 0:
+            degrees = 0
+        if degrees > 180:
+            degrees = 180
+        scaledValue = self.scale(degrees, 0, 180, 1638, 8192)
+        self.servos[servo].duty_u16(int(scaledValue))
     
     def goToPeriod(self,servo, period):
-        if(period < 500):
+        if period < 500:
             period = 500
-        if(period >2500):
-            period =2500
-        #check if servo SM is active, otherwise we are trying to control a thing we do not have control over
-        if self.servos[servo].active():
-            self.servos[servo].put(period)
-        else:
-            raise Exception("TRYING TO CONTROL UNREGISTERED SERVO") #harsh, but at least you'll know
+        if period > 2500:
+            period = 2500
+        scaledValue = self.scale(period, 500, 2500, 1638, 8192)
+        self.servos[servo].duty_u16(int(scaledValue))
         
     def _initServos(self):
-        servoPins = [21,10,17,11]
+        self.servoPins = [21,10,17,11]
+        self.servos = [None for _ in range(4)]
+        #connect the servos by default on construction - advanced uses can disconnect them if required.
         for i in range(4):
-            for j in range(8): # StateMachine range from 0 to 7
-                if usedSM[j]:
-                    continue # Ignore this index if already used
-                try:
-                    self.servos.append(StateMachine(j, self._servo_pwm, freq=2000000, sideset_base=Pin(servoPins[i])))
-                    usedSM[j] = True # Set this index to used
-                    break # Have claimed the SM, can leave now
-                except ValueError:
-                    pass # External resouce has SM, move on
-                if j == 7:
-                    # Cannot find an unused SM
-                    raise ValueError("Could not claim a StateMachine, all in use")
-            
-            self.servos[i].put(self.pulseTrain)
-            self.servos[i].exec("pull()")
-            self.servos[i].exec("mov(isr, osr)")
+            self.registerServo(i)
             
 #ZIPLEDS
 #We drive the ZIP LEDs using one of the PIO statemachines. 
