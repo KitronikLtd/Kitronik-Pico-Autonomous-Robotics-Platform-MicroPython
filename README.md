@@ -56,6 +56,12 @@ where:
 * servo => the servo to control (0-3)
 * degrees => 0-180
 
+```python
+    robot.goToRadians(servo, radians)
+```
+where:
+* servo => the servo to control (0-3)
+* radians => 0 to 3.1416 (Pi to four digits)
 
 ```python
     robot.goToPeriod(servo, period)

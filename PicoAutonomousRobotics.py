@@ -92,6 +92,7 @@ class KitronikPicoRobotBuggy:
     minServoPulse = 500
     pulseTrain = 20000
     degreesToUS = 2000/180
+    piEstimate = 3.1416
     
     #this code drives a pwm on the PIO. It is running at 2Mhz, which gives the PWM a 1uS resolution. 
     @asm_pio(sideset_init=PIO.OUT_LOW)
@@ -122,6 +123,12 @@ class KitronikPicoRobotBuggy:
     def goToPosition(self,servo, degrees):
         pulseLength = int(degrees*self.degreesToUS + 500)
         self.goToPeriod(servo,pulseLength)
+    
+    # Takes the servo to change and the angle in radians to move to.
+    # 0 radians to 3.1416
+    def goToRadians(self, servo, radians):
+        period = int((radians / self.piEstimate) * 2000) + 500
+        self.goToPeriod(servo, period)
     
     def goToPeriod(self,servo, period):
         if(period < 500):
